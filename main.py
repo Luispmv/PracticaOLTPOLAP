@@ -20,10 +20,33 @@ except Exception as e:
 
 # Probar las conexiones leyendo datos desde la base de datos
 try:
-    df_test = pd.read_sql_query("SELECT * FROM autor LIMIT 7", engine_oltp)
+    #df_test = pd.read_sql_query("SELECT * FROM autor LIMIT 7", engine_oltp)
 
     print("Conexión OLTP funciona correctamente")
     print("\nDatos de prueba de la tabla autor:")
     print(df_test)
 except Exception as e:
     print("Error al conectar con OLTP:", e)
+
+print("Extrayendo datos del OLTP...")
+
+#Leer la tabla autor
+df_autor = pd.read_sql_query("SELECT * FROM autor", engine_oltp)
+print("Tabla autor: ", df_autor.shape)
+
+
+#Leer la tabla editorial
+df_editorial = pd.read_sql_query("SELECT * FROM editorial", engine_oltp)
+print("Tabla editorial:", df_editorial.shape)
+
+#Leer tabla libros
+df_libros = pd.read_sql_query("SELECT * FROM libros", engine_oltp)
+print("Tabla libros", df_libros.shape)
+
+#Leer tabla de salida
+df_salidas_det = pd.read_sql_query("SELECT * FROM salida", engine_oltp)
+print("Tabla salidas_det:", df_salidas_det.shape)
+
+print("\nExtraccion completada!")
+
+
