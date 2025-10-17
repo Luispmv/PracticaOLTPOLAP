@@ -9,7 +9,7 @@ try:
 
 
     # Conexión a OLAP (base de datos destino)
-    # engine_olap = create_engine('postgresql+pg8000://postgres:1234@localhost/olap')
+    engine_olap = create_engine('postgresql+pg8000://postgres:1234@localhost:5433/olap')
 
     print("Conexiones creadas de manera exitosa")
     print("OLTP:", engine_oltp)
