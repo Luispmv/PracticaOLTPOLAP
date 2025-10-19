@@ -50,7 +50,6 @@ print("Tabla salidas_det:", df_salidas_det.shape)
 print("\nExtraccion completada!")
 
 
-
 # TRANSFORMACION1: Crear dimension de libros (dim_libros)
 # Combinar libros + autor + editorial
 
@@ -97,4 +96,76 @@ print("Registros: ", len(dim_tiempos))
 
 
 
+# TRANSFORMACION 4: Crear tabla de hechos (ft_salidas)
+# Combinar salidas_det con salida para obtener las fechas
+ft_salidas = df_salidas_det.copy()
 
+#Hacer un join con salida para obtner la fecha 
+#ft_salidas = df_salidas_det.merge(dim_salidas[['idsalida', 'fecha_sal']], on='idsalida', how='left')
+
+
+# Renombrar fecha_sal a idtiempo
+ft_salidas.rename(columns={'fecha_sal':'idtiempo'}, inplace=True)
+
+# Seleccionar solo las columnas necesarias
+ft_salidas = ft_salidas[['idtiempo']]
+
+print("Tabla de hechos creada:")
+print(ft_salidas.head(10))
+print("Registros", len(ft_salidas))
+
+
+
+# CARGA: Insertar datos transformados en las tablas OLAP
+print("Cargando datos al OLAP...")
+
+try:
+    #Cargar dimension libros
+    registros= dim_libros.to_sql('dim_libros', engine_olap, if_exists='append', index=False)
+    print(f"dim_libros: {registros} registros cargados")
+
+    #Cargar dimension salidas
+    registros = dim_salidas.to_sql('dim_salidas', engine_olap, if_exists='append', index=False)
+    print(f"dim_salidas: {registros} registros cargados")
+
+    #Cargar dimension tiempos
+    registros = dim_tiempos.to_sql('dim_tiempos', engine_olap, if_exists='append', index=False)
+    print(f"dim_tiempos: {registros} registros cargados")
+
+    #Cargar tabla de hechos
+    #registros = ft_salidas.to_sql('ft_salidas', engine_olap, if_exists='append', index=False)
+    #print(f"ft_salidas: {registros} registros cargados")
+
+    print("\n ETL completado existosamente")
+
+except Exception as e:
+    print("Error al cargar datos:", e)
+
+
+
+
+# Verificacion de datos en OLAP
+print("Verificando datos en OLAP")
+
+#Verificando dim_libros
+df_check = pd.read_sql_query("SELECT * FROM dim_libros LIMIT 5", engine_olap)
+print("\ndim_libros:")
+print(df_check)
+
+
+# Verificando dim_salidas
+df_check = pd.read_sql_query("SELECT * FROM dim_salidas LIMIT 3", engine_olap)
+print("\ndim_salidas:")
+print(df_check)
+
+#Verificar dim_tiempos
+df_check = pd.read_sql_query("SELECT * FROM dim_tiempos LIMIT 3", engine_olap)
+print("\ndim_tiempos:")
+print(df_check)
+
+#Verificar ft_salidas
+df_check = pd.read_sql_query("SELECT * FROM ft_salidas LIMIT 5", engine_olap)
+print("\nft_salidas:")
+print(df_check)
+
+print("\nVerificacion completada exitosamente :) ")
